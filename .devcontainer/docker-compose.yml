@@ -1,0 +1,51 @@
+version: '3'
+services:
+  laravel_server:
+    container_name: laravel_server
+    image: giovanegurgel/laravel_server
+    restart: unless-stopped
+    ports:
+      - 8008:80
+    volumes:
+      - ../projeto:/var/www/html:delegated
+    networks:
+      - laravel_net
+
+  mysql:
+    container_name: mysql
+    image: mysql:8.0-debian
+    restart: unless-stopped
+    volumes:
+      - ../mysql:/var/lib/mysql
+    ports:
+      - 3310:3306
+    environment:
+      TZ: 'America/Fortaleza'
+      MYSQL_DATABASE: mysql_banco
+      MYSQL_USER: mysql_user
+      MYSQL_PASSWORD: mysql_user
+      MYSQL_ROOT_PASSWORD: mysql_user
+    networks:
+      - laravel_net
+
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin:5.2.1-apache
+    restart: unless-stopped
+    ports:
+      - 8010:80
+    environment:
+      TZ: 'America/Fortaleza'
+      PMA_HOST: mysql
+      PMA_PMADB: mysql_banco
+      PMA_USER: root
+      PMA_PASSWORD: mysql_user
+      PMA_PORT: 3306
+    networks:
+      - laravel_net
+    depends_on:
+      - mysql
+
+networks:
+  laravel_net:
+    driver: bridge
